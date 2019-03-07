@@ -41,7 +41,11 @@ class DataFrame:
                 raise ValueError(f"array for key {key} is not one-dimensional")
 
     def _check_array_lengths(self, data):
-        pass
+        it = iter(data.items())
+        a_length = len(next(it)[1])
+        all_same_length = all(a_length == len(i[1]) for i in it)
+        if not all_same_length:
+            raise ValueError("Input data not of equal length")
 
     def _convert_unicode_to_object(self, data):
         new_data = {}
