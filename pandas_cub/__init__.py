@@ -60,7 +60,7 @@ class DataFrame:
         -------
         int: the number of rows in the dataframe
         """
-        pass
+        return len(next(iter(self._data.items()))[1])
 
     @property
     def columns(self):
@@ -73,7 +73,7 @@ class DataFrame:
         -------
         list of column names
         """
-        pass
+        return [k for k, _ in self._data.items()]
 
     @columns.setter
     def columns(self, columns):
