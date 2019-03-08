@@ -48,7 +48,8 @@ class DataFrame:
             raise ValueError("Input data not of equal length")
 
     def _convert_unicode_to_object(self, data):
-        new_data = {}
+        new_data = {k: (d.astype(object) if d.dtype.kind == 'U' else d) for k, d
+                in data.items()}
         return new_data
 
     def __len__(self):
