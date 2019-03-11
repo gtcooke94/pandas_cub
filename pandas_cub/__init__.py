@@ -107,7 +107,7 @@ class DataFrame:
         -------
         two-item tuple of number of rows and columns
         """
-        pass
+        return (len(self), len(self._data))
 
     def _repr_html_(self):
         """
