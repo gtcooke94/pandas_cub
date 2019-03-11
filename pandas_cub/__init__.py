@@ -48,8 +48,8 @@ class DataFrame:
             raise ValueError("Input data not of equal length")
 
     def _convert_unicode_to_object(self, data):
-        new_data = {k: (d.astype(object) if d.dtype.kind == 'U' else d) for k, d
-                in data.items()}
+        new_data = {k: (d.astype(object) if d.dtype.kind == 'U' else d) for
+                    k, d in data.items()}
         return new_data
 
     def __len__(self):
@@ -89,7 +89,16 @@ class DataFrame:
         -------
         None
         """
-        pass
+        if not isinstance(columns, list):
+            raise TypeError("columns must be a list")
+        if len(columns) != len(self._data):
+            raise ValueError("New columns list must be of the same size as the"
+                             " current number of columns")
+        if any(not isinstance(c, str) for c in columns):
+            raise TypeError("Columns contain a non-string object")
+        if len(columns) != len(set(columns)):
+            raise ValueError("There are duplicated values in the columns")
+        self._data = {c: d[1] for c, d in zip(columns, self._data.items())}
 
     @property
     def shape(self):
