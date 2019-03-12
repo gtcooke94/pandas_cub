@@ -239,6 +239,20 @@ class DataFrame:
             return DataFrame({item: self._data[item]})
         elif isinstance(item, list):
             return DataFrame({i: self._data[i] for i in item})
+        elif isinstance(item, DataFrame):
+            if len(item.columns) != 1:
+                raise ValueError("Boolean Dataframe input must be one column")
+            _, inds = next(iter(item._data.items()))
+            if inds.dtype.kind != 'b':
+                raise ValueError('Index must be boolean')
+            # Get just the rows that are true in the boolean array
+            # Create the dict we will have with empty np array to append to
+            index_rows = self.values[inds]
+            indexed_dict = {c: index_rows[:, i] for i, c in
+                    enumerate(self.columns)}
+            return DataFrame(indexed_dict)
+
+
 
 
     def _getitem_tuple(self, item):
