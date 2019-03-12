@@ -235,9 +235,10 @@ class DataFrame:
         -------
         A subset of the original DataFrame
         """
-        if not isinstance(item, str):
-            raise TypeError('Must index with a string')
-        return DataFrame({item: self._data[item]})
+        if isinstance(item, str):
+            return DataFrame({item: self._data[item]})
+        elif isinstance(item, list):
+            return DataFrame({i: self._data[i] for i in item})
 
 
     def _getitem_tuple(self, item):
