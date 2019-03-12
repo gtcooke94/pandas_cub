@@ -205,7 +205,7 @@ class DataFrame:
         -------
         A single 2D NumPy array of the underlying data
         """
-        pass
+        return np.column_stack([d for _, d in self._data.items()])
 
     @property
     def dtypes(self):
@@ -216,7 +216,10 @@ class DataFrame:
         their data type in the other
         """
         DTYPE_NAME = {'O': 'string', 'i': 'int', 'f': 'float', 'b': 'bool'}
-        pass
+        col_names = np.array(self.columns)
+        dtypes = np.array([DTYPE_NAME.get(self._data[k].dtype.kind) for k in
+                           self.columns])
+        return DataFrame({'Column Name': col_names, 'Data Type': dtypes})
 
     def __getitem__(self, item):
         """
