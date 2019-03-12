@@ -235,7 +235,10 @@ class DataFrame:
         -------
         A subset of the original DataFrame
         """
-        pass
+        if not isinstance(item, str):
+            raise TypeError('Must index with a string')
+        return DataFrame({item: self._data[item]})
+
 
     def _getitem_tuple(self, item):
         # simultaneous selection of rows and cols -> df[rs, cs]
