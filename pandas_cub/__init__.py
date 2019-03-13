@@ -263,6 +263,24 @@ class DataFrame:
         if len(item) != 2:
             raise ValueError("simultaneous row and column selection must be of"
                              " length 2")
+        row_selection, col_selection = item
+        if isinstance(row_selection, int):
+            row_selection = [row_selection]
+        if isinstance(col_selection, int):
+            col_selection = [self.columns[col_selection]]
+        if isinstance(col_selection, str):
+            col_selection = [col_selection]
+        if isinstance(row_selection, DataFrame):
+            if row_selection.shape[1] != 1:
+                raise ValueError("row_selection dataframe must be one column")
+            row_selection = row_selection.values
+            if row_selection.dtype.kind != 'b':
+                raise TypeError("Row selection DataFrame must be boolean")
+            
+         
+        indexed_dict = {c: self[c].values[row_selection].flatten() for c in
+                col_selection}
+        return DataFrame(indexed_dict)
 
     def _ipython_key_completions_(self):
         # allows for tab completion when doing df['c
