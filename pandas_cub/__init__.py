@@ -249,15 +249,20 @@ class DataFrame:
             # Create the dict we will have with empty np array to append to
             index_rows = self.values[inds]
             indexed_dict = {c: index_rows[:, i] for i, c in
-                    enumerate(self.columns)}
+                            enumerate(self.columns)}
             return DataFrame(indexed_dict)
-
-
-
+        elif not isinstance(item, tuple):
+            raise TypeError(
+                "Must either pass string, list of string, one column "
+                "boolean DataFrame, or both a row and a column selection"
+            )
+        return self._getitem_tuple(item)
 
     def _getitem_tuple(self, item):
         # simultaneous selection of rows and cols -> df[rs, cs]
-        pass
+        if len(item) != 2:
+            raise ValueError("simultaneous row and column selection must be of"
+                             " length 2")
 
     def _ipython_key_completions_(self):
         # allows for tab completion when doing df['c
