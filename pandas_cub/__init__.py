@@ -268,6 +268,10 @@ class DataFrame:
             col_selection = [self.columns[col_selection]]
         elif isinstance(col_selection, str):
             col_selection = [col_selection]
+        elif isinstance(col_selection, list):
+            col_selection = [c if isinstance(c, str) else self.columns[c]
+                             for c in col_selection]
+
         if isinstance(row_selection, int):
             row_selection = [row_selection]
         elif isinstance(row_selection, DataFrame):
