@@ -305,10 +305,30 @@ class DataFrame:
         # allows for tab completion when doing df['c
         return self.columns
 
-
     def __setitem__(self, key, value):
         # adds a new column or a overwrites an old column
-        pass
+        if not isinstance(key, str):
+            raise NotImplementedError("DataFrame can only set a single column")
+        if isinstance(value, np.ndarray):
+            if value.ndim != 1:
+                raise ValueError("Value for new column must be a 1D numpy array")
+            elif len(value) != len(self):
+                raise ValueError("New column not same length as dataframe")
+        elif isinstance(value, DataFrame):
+            if len(value.columns) != 1:
+                raise ValueError("Input must be a single column")
+            elif len(value) != len(self):
+                raise ValueError("New column not same length as dataframe")
+            value = value.values
+        elif isinstance(value, (str, int, float, bool)):
+            value = np.repeat(value, len(self))
+        else:
+            raise TypeError("Input value not an accepted type")
+        if value.dtype.kind == 'U':
+            value = value.astype('O')
+        self._data[key] = value
+        
+
 
     def head(self, n=5):
         """
