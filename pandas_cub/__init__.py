@@ -303,7 +303,8 @@ class DataFrame:
 
     def _ipython_key_completions_(self):
         # allows for tab completion when doing df['c
-        pass
+        return self.columns
+
 
     def __setitem__(self, key, value):
         # adds a new column or a overwrites an old column
