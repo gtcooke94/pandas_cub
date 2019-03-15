@@ -406,7 +406,17 @@ class DataFrame:
         -------
         A DataFrame
         """
-        pass
+        new_data = {}
+        for col in self.columns:
+            if self._data[col].dtype.kind == 'O':
+                try:
+                    data = aggfunc(self._data[col])
+                except TypeError:
+                    continue
+            else:
+                data = aggfunc(self._data[col])
+            new_data[col] = (np.array(data)).flatten()
+        return DataFrame(new_data)
 
     def isna(self):
         """
