@@ -271,6 +271,19 @@ class DataFrame:
         elif isinstance(col_selection, list):
             col_selection = [c if isinstance(c, str) else self.columns[c]
                              for c in col_selection]
+        elif isinstance(col_selection, slice):
+            start = col_selection.start
+            stop = col_selection.stop
+            step = col_selection.step
+            if isinstance(start, str):
+                start = self.columns[start]
+            if isinstance(stop, str):
+                stop = self.columns[stop + 1]
+            col_selection = self.columns[start:stop:step]
+
+        else:
+            raise TypeError("Column selection must be an integer, string,"
+                            " list, or slice")
 
         if isinstance(row_selection, int):
             row_selection = [row_selection]
@@ -285,7 +298,7 @@ class DataFrame:
             raise TypeError("row_selection must be an integer, list, slice, or"
                             " DataFrame")
         indexed_dict = {c: self[c].values[row_selection].flatten() for c in
-                col_selection}
+                        col_selection}
         return DataFrame(indexed_dict)
 
     def _ipython_key_completions_(self):
