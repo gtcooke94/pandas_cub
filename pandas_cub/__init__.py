@@ -438,7 +438,10 @@ class DataFrame:
         -------
         A DataFrame
         """
-        pass
+        isna_frame = self.isna()
+        sum_data = {c: np.array([len(self) - sum(isna_frame._data[c])]) for c
+                    in self.columns}
+        return DataFrame(sum_data)
 
     def unique(self):
         """
