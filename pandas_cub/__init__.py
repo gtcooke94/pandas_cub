@@ -638,8 +638,18 @@ class DataFrame:
         -------
         A DataFrame
         """
-        def func():
-            pass
+        def func(arr):
+            if arr.dtype.kind == 'i':
+                arr = arr.astype('f')
+            right = np.roll(arr, n)
+            left = arr
+            result = left - right
+            if n > 0:
+                result[:n] = np.nan
+            elif n < 0:
+                result[-n:] = np.nan
+            return result
+            
         return self._non_agg(func)
 
     def pct_change(self, n=1):
