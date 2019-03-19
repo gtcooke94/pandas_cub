@@ -484,6 +484,8 @@ class DataFrame:
                 self.columns}
         for col, (values, counts) in col_values_count.items():
             order = np.argsort(counts)[::-1]
+            if normalize:
+                counts = counts / sum(counts)
             df_to_add = DataFrame({col: values[order], 'count': counts[order]})
             to_return.append(df_to_add)
         return to_return[0] if len(to_return) == 1 else to_return
