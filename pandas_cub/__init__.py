@@ -461,7 +461,8 @@ class DataFrame:
         -------
         A DataFrame
         """
-        pass
+        return DataFrame({c: np.array([len(np.unique(self._data[c]))]) for c in
+                          self.columns})
 
     def value_counts(self, normalize=False):
         """
