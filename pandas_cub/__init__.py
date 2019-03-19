@@ -622,7 +622,8 @@ class DataFrame:
         -------
         A DataFrame
         """
-        pass
+        return DataFrame({c: funcname(self._data[c], **kwargs) for c in
+                         self.columns})
 
     def diff(self, n=1):
         """
