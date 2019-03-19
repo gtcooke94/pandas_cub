@@ -451,9 +451,9 @@ class DataFrame:
         -------
         A list of one-column DataFrames
         """
-        to_return = [DataFrame({c: np.unique(self._data[c])}) for c in self.columns]
+        to_return = [DataFrame({c: np.unique(self._data[c])}) for c in
+                     self.columns]
         return to_return[0] if len(to_return) == 1 else to_return
-
 
     def nunique(self):
         """
@@ -480,8 +480,8 @@ class DataFrame:
         A list of DataFrames or a single DataFrame if one column
         """
         to_return = []
-        col_values_count = {c: np.unique(self._data[c], return_counts=True) for c in
-                self.columns}
+        col_values_count = {c: np.unique(self._data[c], return_counts=True) for
+                            c in self.columns}
         for col, (values, counts) in col_values_count.items():
             order = np.argsort(counts)[::-1]
             if normalize:
@@ -489,7 +489,6 @@ class DataFrame:
             df_to_add = DataFrame({col: values[order], 'count': counts[order]})
             to_return.append(df_to_add)
         return to_return[0] if len(to_return) == 1 else to_return
-
 
     def rename(self, columns):
         """
@@ -499,12 +498,18 @@ class DataFrame:
         ----------
         columns: dict
             A dictionary mapping the old column name to the new column name
-        
+
         Returns
         -------
         A DataFrame
         """
-        pass
+        if not isinstance(columns, dict):
+            return ValueError("columns must be a dictionary")
+        new_dict = {}
+        for old_col in self.columns:
+            new_col = columns.get(old_col, old_col)
+            new_dict[new_col] = self._data[old_col]
+        return DataFrame(new_dict)
 
     def drop(self, columns):
         """
