@@ -451,7 +451,7 @@ class DataFrame:
         -------
         A list of one-column DataFrames
         """
-        pass
+        return [DataFrame({c: np.unique(self._data[c])}) for c in self.columns]
 
     def nunique(self):
         """
