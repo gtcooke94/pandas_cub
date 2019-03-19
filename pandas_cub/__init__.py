@@ -523,7 +523,13 @@ class DataFrame:
         -------
         A DataFrame
         """
-        pass
+        if isinstance(columns, str):
+            columns = [columns]
+        elif not isinstance(columns, list):
+            raise TypeError('columns must be a string or list of strings')
+
+        new_data = {c: self._data[c] for c in self.columns if c not in columns}
+        return DataFrame(new_data)
 
     #### Non-Aggregation Methods ####
 
