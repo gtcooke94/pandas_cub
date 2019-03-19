@@ -451,7 +451,9 @@ class DataFrame:
         -------
         A list of one-column DataFrames
         """
-        return [DataFrame({c: np.unique(self._data[c])}) for c in self.columns]
+        to_return = [DataFrame({c: np.unique(self._data[c])}) for c in self.columns]
+        return to_return[0] if len(to_return) == 1 else to_return
+
 
     def nunique(self):
         """
