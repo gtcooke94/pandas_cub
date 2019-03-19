@@ -479,7 +479,15 @@ class DataFrame:
         -------
         A list of DataFrames or a single DataFrame if one column
         """
-        pass
+        to_return = []
+        col_values_count = {c: np.unique(self._data[c], return_counts=True) for c in
+                self.columns}
+        for col, (values, counts) in col_values_count.items():
+            order = np.argsort(counts)[::-1]
+            df_to_add = DataFrame({col: values[order], 'count': counts[order]})
+            to_return.append(df_to_add)
+        return to_return[0] if len(to_return) == 1 else to_return
+
 
     def rename(self, columns):
         """
