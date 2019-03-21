@@ -747,7 +747,19 @@ class DataFrame:
         -------
         A DataFrame
         """
-        pass
+        if isinstance(other, DataFrame):
+            if len(other.columns) != 1:
+                raise ValueError(
+                    f"{op.__name__} must either use a single value or a "
+                    "single column DataFrame."
+                )
+            other = next(iter(self._data.values()))
+        new_data = {c: getattr(self._data[c], op)(other) for c in
+                    self.columns}
+        return DataFrame(new_data)
+
+
+            
 
     def sort_values(self, by, asc=True):
         """
