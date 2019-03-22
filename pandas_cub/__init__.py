@@ -1,4 +1,5 @@
 import numpy as np
+from collections import defaultdict
 
 __version__ = '0.0.1'
 
@@ -846,7 +847,7 @@ class DataFrame:
                 values_vals = [v for v in to_return_dict.values()]
                 pivot_dict = {rows: np.array(rows_vals), aggfunc:
                               np.array(values_vals)}
-        if not rows:
+        elif not rows:
             if not values:
                 value_counts = self[columns].value_counts()
                 rows_vals = value_counts[columns].values.flatten()
@@ -860,7 +861,32 @@ class DataFrame:
                 row_val_dict = self._get_row_val_dict(columns, values)
                 pivot_dict = {k: np.array([getattr(v, aggfunc)()]) for k, v in
                               row_val_dict.items()}
+        else:
+            # Full pivot implementation
+            row_val_col_dict = self._get_row_val_col_dict(rows, columns,
+                                                          values)
+            pivot_columns = list(self[columns].unique().values.flatten())
+            final_colums = [rows, *pivot_columns]
+            final_row_values = self[rows].unique().values.flatten()
+            pivot_dict = {rows: final_row_values}
+            for c in pivot_columns:
+                column_vals = []
+                for row_val in final_row_values:
+                    vals = np.array(row_val_col_dict[(row_val, c)])
+                    column_vals.append(getattr(vals, aggfunc)())
+                pivot_dict[c] = np.array(column_vals)
+
         return DataFrame(pivot_dict)
+
+    def _get_row_val_col_dict(self, rows, columns, values):
+        row_val_col_dict = defaultdict(list)
+        for i in range(len(self)):
+            row = self[i, [rows, columns, values]]
+            row_val = row[rows].values.flatten()[0]
+            col_val = row[columns].values.flatten()[0]
+            value_val = row[values].values.flatten()[0]
+            row_val_col_dict[(row_val, col_val)].append(value_val)
+        return row_val_col_dict
 
     def _get_row_val_dict(self, rows, values):
         row_val_dict = {val[0]: np.array([]) for val in
