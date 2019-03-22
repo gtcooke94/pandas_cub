@@ -832,7 +832,32 @@ class DataFrame:
         -------
         A DataFrame
         """
-        pass
+        pivot_dict = {}
+        if not columns:
+            if not values:
+                value_counts = self[rows].value_counts()
+                return value_counts.rename({'count': 'size'})
+            else:
+                row_val_dict = {val[0]: np.array([]) for val in
+                                self[rows].unique().values}
+                for i in range(len(self)):
+                    row = self[i, [rows, values]].values
+                    row_val = row[0][0]
+                    value = row[0][1]
+                    row_val_dict[row_val] = np.append(row_val_dict[row_val],
+                                                      value)
+                to_return_dict = {
+                    k: getattr(v, aggfunc)() for k, v in
+                    row_val_dict.items()
+                }
+                #  rows_vals, values_vals = (to_return_dict.keys(),
+                #                           to_return_dict.values())
+                rows_vals = [k for k in to_return_dict.keys()]
+                values_vals = [v for v in to_return_dict.values()]
+                pivot_dict = {rows: np.array(rows_vals), aggfunc:
+                        np.array(values_vals)}
+        return DataFrame(pivot_dict)
+
 
     def _add_docs(self):
         agg_names = ['min', 'max', 'mean', 'median', 'sum', 'var',
