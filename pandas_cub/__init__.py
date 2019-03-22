@@ -1,5 +1,6 @@
 import numpy as np
 from collections import defaultdict
+from copy import deepcopy
 
 __version__ = '0.0.1'
 
@@ -1005,7 +1006,13 @@ class StringMethods:
         return self._str_method(str.encode, col, encoding, errors)
 
     def _str_method(self, method, col, *args):
-        pass
+        col_vals = self._df._data[col]
+        if col_vals.dtype.kind != 'O':
+            raise TypeError("String methods must operate on numpy 'O' type "
+                            "arrays")
+        new_strings = []
+        new_strings = [method(s, *args) for s in col_vals]
+        return DataFrame({col: np.array(new_strings)})
 
 
 def read_csv(fn):
