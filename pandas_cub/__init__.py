@@ -856,6 +856,17 @@ class DataFrame:
                 values_vals = [v for v in to_return_dict.values()]
                 pivot_dict = {rows: np.array(rows_vals), aggfunc:
                         np.array(values_vals)}
+        if not rows:
+            if not values:
+                value_counts = self[columns].value_counts()
+                rows_vals = value_counts[columns].values.flatten()
+                values_vals = value_counts['count'].values.flatten()
+                pivot_dict = {row_name: count for row_name, count in
+                              zip(rows_vals, values_vals)}
+
+                pivot_dict = {row_name: np.array([count]) for row_name, count in
+                              sorted(zip(rows_vals, values_vals))}
+                
         return DataFrame(pivot_dict)
 
 
