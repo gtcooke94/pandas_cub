@@ -803,7 +803,16 @@ class DataFrame:
         -------
         A DataFrame
         """
-        pass
+        if frac:
+            if frac < 0:
+                raise ValueError("Fraction must be positive")
+            n = int(len(self) * frac)
+        if not isinstance(n, int):
+            raise TypeError("n must be an integer")
+        if seed is not None:
+            np.random.seed(seed)
+        selection = np.random.choice(len(self), n, replace=replace)
+        return self[list(selection), :]
 
     def pivot_table(self, rows=None, columns=None, values=None, aggfunc=None):
         """
