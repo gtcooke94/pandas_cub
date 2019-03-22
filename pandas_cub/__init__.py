@@ -311,7 +311,8 @@ class DataFrame:
             raise NotImplementedError("DataFrame can only set a single column")
         if isinstance(value, np.ndarray):
             if value.ndim != 1:
-                raise ValueError("Value for new column must be a 1D numpy array")
+                raise ValueError("Value for new column must be a 1D numpy "
+                                 "array")
             elif len(value) != len(self):
                 raise ValueError("New column not same length as dataframe")
         elif isinstance(value, DataFrame):
@@ -327,8 +328,6 @@ class DataFrame:
         if value.dtype.kind == 'U':
             value = value.astype('O')
         self._data[key] = value
-        
-
 
     def head(self, n=5):
         """
@@ -351,7 +350,7 @@ class DataFrame:
         Parameters
         ----------
         n: int
-        
+
         Returns
         -------
         DataFrame
@@ -401,7 +400,7 @@ class DataFrame:
         Parameters
         ----------
         aggfunc: str of the aggregation function name in NumPy
-        
+
         Returns
         -------
         A DataFrame
@@ -427,7 +426,7 @@ class DataFrame:
         A DataFrame of booleans the same size as the calling DataFrame
         """
         new_data = {c: np.isnan(self._data[c]) if self._data[c].dtype.kind !=
-                    'O' else self._data[c] == None for c in self.columns} 
+                    'O' else self._data[c] is None for c in self.columns}
         return DataFrame(new_data)
 
     def count(self):
@@ -838,24 +837,15 @@ class DataFrame:
                 value_counts = self[rows].value_counts()
                 return value_counts.rename({'count': 'size'})
             else:
-                row_val_dict = {val[0]: np.array([]) for val in
-                                self[rows].unique().values}
-                for i in range(len(self)):
-                    row = self[i, [rows, values]].values
-                    row_val = row[0][0]
-                    value = row[0][1]
-                    row_val_dict[row_val] = np.append(row_val_dict[row_val],
-                                                      value)
+                row_val_dict = self._get_row_val_dict(rows, values)
                 to_return_dict = {
                     k: getattr(v, aggfunc)() for k, v in
                     row_val_dict.items()
                 }
-                #  rows_vals, values_vals = (to_return_dict.keys(),
-                #                           to_return_dict.values())
                 rows_vals = [k for k in to_return_dict.keys()]
                 values_vals = [v for v in to_return_dict.values()]
                 pivot_dict = {rows: np.array(rows_vals), aggfunc:
-                        np.array(values_vals)}
+                              np.array(values_vals)}
         if not rows:
             if not values:
                 value_counts = self[columns].value_counts()
@@ -864,10 +854,23 @@ class DataFrame:
                 pivot_dict = {row_name: count for row_name, count in
                               zip(rows_vals, values_vals)}
 
-                pivot_dict = {row_name: np.array([count]) for row_name, count in
-                              sorted(zip(rows_vals, values_vals))}
-                
+                pivot_dict = {row_name: np.array([count]) for row_name, count
+                              in sorted(zip(rows_vals, values_vals))}
+            else:
+                row_val_dict = self._get_row_val_dict(columns, values)
+                pivot_dict = {k: np.array([getattr(v, aggfunc)()]) for k, v in
+                              row_val_dict.items()}
         return DataFrame(pivot_dict)
+
+    def _get_row_val_dict(self, rows, values):
+        row_val_dict = {val[0]: np.array([]) for val in
+                        self[rows].unique().values}
+        for i in range(len(self)):
+            row = self[i, [rows, values]].values
+            row_val = row[0][0]
+            value = row[0][1]
+            row_val_dict[row_val] = np.append(row_val_dict[row_val], value)
+        return row_val_dict
 
 
     def _add_docs(self):
