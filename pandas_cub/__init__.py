@@ -758,9 +758,6 @@ class DataFrame:
                     self.columns}
         return DataFrame(new_data)
 
-
-            
-
     def sort_values(self, by, asc=True):
         """
         Sort the DataFrame by one or more values
@@ -774,7 +771,18 @@ class DataFrame:
         -------
         A DataFrame
         """
-        pass
+        if isinstance(by, str):
+            order = np.argsort(self._data[by])
+        elif isinstance(by, list):
+            order = np.lexsort([self._data[c] for c in by[::-1]])
+        else:
+            return ValueError("by must be a string or list of string")
+
+        if not asc:
+            order = order[::-1]
+        ordered_data = {c: self._data[c][order] for c in self.columns}
+        return DataFrame(ordered_data)
+
 
     def sample(self, n=None, frac=None, replace=False, seed=None):
         """
